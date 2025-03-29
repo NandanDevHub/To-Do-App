@@ -1,7 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using To_Do_App.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add EF Core Dependency Injection
+
+builder.Services.AddDbContext<ToDoContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
