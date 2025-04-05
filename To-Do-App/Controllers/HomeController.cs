@@ -1,26 +1,82 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using To_Do_App.Models;
 
 namespace To_Do_App.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private ToDoContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ToDoContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string id)
         {
-            return View();
+            var filters = new Filters(id);
+            ViewBag.Filters = filters;
+
+            ViewBag.Categories = _context.Categories.ToList();
+            ViewBag.Statuses = _context.Statuses.ToList();
+            ViewBag.DueFilters = Filters.DueFiltersValues;
+
+            IQueryable<ToDo> todos = _context.ToDos.Include(t => t.Category).Include(t => t.Status);
+
+            if (filters.HasCategory)
+            {
+                todos = todos.Where(t => t.CategoryId == filters.CategoryId);
+            }
+
+            if (filters.HasStatus)
+            {
+                todos = todos.Where(t => t.StatusId == filters.StatusId);
+            }
+
+            if (filters.HasDue)
+            {
+                var today = DateTime.Today;
+                if (filters.IsPast)
+                {
+                    todos = todos.Where(t => t.DueDate < today);
+                }
+                else if (filters.IsFuture)
+                {
+                    todos = todos.Where(t => t.DueDate > today);
+                }
+                else if (filters.IsToday)
+                {
+                    todos = todos.Where(t => t.DueDate == today);
+                }
+            }
+
+            var tasks = todos.OrderBy(t => t.DueDate).ToList();
+            return View(tasks);
         }
 
-        public IActionResult Privacy()
+        [HttpGet]
+        public IActionResult Add()
         {
-            return View();
+            ViewBag.Categories = _context.Categories.ToList();
+            ViewBag.Statuses = _context.Statuses.ToList();
+            var task = new ToDo() { StatusId = "open" };
+            return View(task);
+        }
+
+        [HttpPost]
+        public IActionResult Add(ToDo task)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.ToDos.Add(task);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            ViewBag.Categories = _context.Categories.ToList();
+            ViewBag.Statuses = _context.Statuses.ToList();
+            return View(task);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
