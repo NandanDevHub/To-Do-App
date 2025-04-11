@@ -1,8 +1,62 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model IEnumerable<ToDo>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row">
+    <div class="col-md-2">
+        <form asp-action="Filter" method="post">
+            <div class="mb-3">
+                <label class="form-label">Category</label>
+                <select name="filter" class="form-select"
+                        asp-items="@(new SelectList(ViewBag.Categories,"CategoryId", "Name",ViewBag.Filters.CategoryId))">  
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Due:</label>
+                <select name="filter" class="form-select"
+                    asp-items="@(new SelectList(ViewBag.DueFilters, "Key", "Value", ViewBag.Filters.Due))">
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Status:</label>
+                <select name="filter" class="form-select"
+                    asp-items="@(new SelectList(ViewBag.Statuses, "StatusId", "Name", ViewBag.Filters.StatusId))">
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a asp-action="Index" asp-route-id="" class="btn btn-primary">Clear</a>
+        </form>
+    </ div>
+    <div class="col-md-10">
+        <form asp-action="MarkComplete" method="post" asp-route-id="@ViewBag.Filters.FilterString">
+            <table class="table table-bordered table-striped mt-2">
+                <thead>
+                <tr>
+                <th scope="col">Description</th>
+                <th scope="col">Category</th>
+                <th scope="col">Due Date</th>
+                <th scope="col">Status</th>
+                <th class="w-25">Actions</th>
+                </thead>
+                <tbody>
+                    @foreach (var task in Model)
+                    {
+                            var overdue = task.Overdue ? "bg-warning" : "";
+                            <tr>
+                                <td>@task.Description</td>
+                                <td>@task.Category.Name</td>
+                                <td class="@overdue">@task.DueDate?.ToShortDateString()</td>
+                                <td>
+                                    @if (task.StatusId == "open")
+                                    {
+                                        <button type="submit" class="btn btn-primary btn-sm" name="@nameof(ToDo.Id)">Mark Completed</button>
+                                    }
+                                </td>
+                            </tr>
+                    }
+                </tbody>
+            </table>
+        </form>
+    </div>
 </div>
