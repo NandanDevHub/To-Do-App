@@ -79,6 +79,37 @@ namespace To_Do_App.Controllers
             return View(task);
         }
 
+        [HttpPost]
+        public IActionResult Filter(string[,] filters)
+        {
+            string id = string.Join('-', filters);
+            return RedirectToAction("Index", new { ID = id });
+        }
+
+        [HttpPost]
+        public IActionResult MarkComplete([FromRoute] string id, ToDo selected)
+        {
+            selected = _context.ToDos.Find(selected.Id);
+            if (selected != null)
+            {
+                selected.StatusId = "closed";
+                _context.SaveChanges();
+            }
+            return RedirectToAction("Index", new { ID = id });
+        }
+
+        [HttpPost]
+        public IActionResult Delete(string id)
+        {
+            var toDelete = _context.ToDos.Where(t => t.StatusId == "closed").ToList();
+            foreach (var task in toDelete)
+            {
+                _context.ToDos.Remove(task);
+            }
+            _context.SaveChanges();
+            return RedirectToAction("Index", new {ID = id});
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
