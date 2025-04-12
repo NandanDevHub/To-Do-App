@@ -1,0 +1,55 @@
+﻿@model To_Do_App.Models.ToDo
+@{
+    ViewData["Title"] = "Edit Task";
+}
+
+<h2 class="mb-4">Edit Task</h2>
+
+<form asp-action="Edit" method="post" class="row g-3">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="col-md-8">
+        <label asp-for="Description" class="form-label"></label>
+        <input asp-for="Description" class="form-control" />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="CategoryId" class="form-label"></label>
+        <select asp-for="CategoryId"
+                asp-items="@(new SelectList(ViewBag.Categories, "CategoryId", "Name"))"
+                class="form-select"></select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="StatusId" class="form-label"></label>
+        <select asp-for="StatusId"
+                asp-items="@(new SelectList(ViewBag.Statuses, "StatusId", "Name"))"
+                class="form-select"></select>
+        <span asp-validation-for="StatusId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Priority" class="form-label"></label>
+        <select asp-for="Priority"
+                asp-items="Html.GetEnumSelectList<To_Do_App.Models.Priority>()"
+                class="form-select"></select>
+        <span asp-validation-for="Priority" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="DueDate" class="form-label"></label>
+        <input asp-for="DueDate" class="form-control" />
+        <span asp-validation-for="DueDate" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-action="Index" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
