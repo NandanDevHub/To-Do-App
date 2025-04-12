@@ -13,6 +13,9 @@ namespace To_Do_App.Models
         [Required(ErrorMessage = "Please Enter the Due Date.")]
         public DateTime? DueDate { get; set; }
 
+        [Required]
+        public Priority Priority { get; set; } = Priority.Medium;
+
         [Required(ErrorMessage = "Please Select the Category.")]
         public string CategoryId { get; set; } = string.Empty;
 
@@ -25,4 +28,5 @@ namespace To_Do_App.Models
 
         public bool Overdue => StatusId == "open" && DueDate < DateTime.Today;
     }
+    public enum Priority { Low = 1, Medium = 2, High = 3 }
 }

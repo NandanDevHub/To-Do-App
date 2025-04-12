@@ -1,67 +1,98 @@
 ﻿@model IEnumerable<ToDo>
 
+@functions {
+    string StatusBadge(string statusId) => statusId switch
+    {
+        "open" => "bg-primary",
+        "closed" => "bg-success",
+        _ => "bg-secondary"
+    };
+
+    string PriorityBadgeClass(string priority) => priority switch
+    {
+        "High" => "bg-danger",
+        "Medium" => "bg-warning text-dark",
+        "Low" => "bg-success",
+        _ => "bg-secondary"
+    };
+}
+
 <div class="row">
+    <!-- Filter Sidebar -->
     <div class="col-md-2">
         <form asp-action="Filter" method="post">
             <div class="mb-3">
                 <label class="form-label">Category</label>
                 <select name="filter" class="form-select"
-                        asp-items="@(new SelectList(ViewBag.Categories,"CategoryId", "Name",ViewBag.Filters.CategoryId))">  
+                        asp-items="@(new SelectList(ViewBag.Categories, "CategoryId", "Name", ViewBag.Filters.CategoryId))">
                     <option value="all">All</option>
                 </select>
             </div>
             <div class="mb-3">
                 <label class="form-label">Due:</label>
                 <select name="filter" class="form-select"
-                    asp-items="@(new SelectList(ViewBag.DueFilters, "Key", "Value", ViewBag.Filters.Due))">
+                        asp-items="@(new SelectList(ViewBag.DueFilters, "Key", "Value", ViewBag.Filters.Due))">
                     <option value="all">All</option>
                 </select>
             </div>
             <div class="mb-3">
                 <label class="form-label">Status:</label>
                 <select name="filter" class="form-select"
-                    asp-items="@(new SelectList(ViewBag.Statuses, "StatusId", "Name", ViewBag.Filters.StatusId))">
+                        asp-items="@(new SelectList(ViewBag.Statuses, "StatusId", "Name", ViewBag.Filters.StatusId))">
                     <option value="all">All</option>
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Filter</button>
-            <a asp-action="Index" asp-route-id="" class="btn btn-primary">Clear</a>
+            <a asp-action="Index" asp-route-id="" class="btn btn-secondary ms-2">Clear</a>
         </form>
     </div>
+
+    <!-- Task Cards -->
     <div class="col-md-10">
-        <form asp-action="MarkComplete" method="post" asp-route-id="@ViewBag.Filters.FilterString">
-            <table class="table table-bordered table-striped mt-2">
-                <thead>
-                <tr>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Due Date</th>
-                <th>Status</th>
-                <th class="w-25">Actions</th>
-                </thead>    
-                <tbody>
-                @foreach (var task in Model)
-                {
-                    var overdue = task.Overdue ? "bg-warning" : "";
-                    <tr>
-                        <td>@task.Description</td>
-                        <td>@task.Category.Name</td>
-                        <td class="@overdue">@task.DueDate?.ToShortDateString()</td>
-                        <td class="@overdue">@task.Status.Name</td>
-                        <td>
-                            @if (task.StatusId == "open")
-                            {
-                                <button type="submit" class="btn btn-primary btn-sm" name="@nameof(ToDo.Id)">Mark Completed</button>
-                            }
-                        </td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-        </form>
-        <form asp-action="Delete" method="post" asp-route-id="@ViewBag.Filters.FilterString">
-            <a asp-action="Add" class="btn btn-primary"> Add New task</a>
-                <button type="submit" class="btn btn-primary ">Delete completed tasks</button>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-1">
+            @foreach (var task in Model)
+            {
+                var overdueClass = task.Overdue ? "border-warning border-2" : "border-light";
+                <div class="col">
+                    <div class="card shadow-sm h-100 @overdueClass">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@task.Description</h5>
+                            <p class="card-text mb-2">
+                                <span class="badge bg-secondary">@task.Category?.Name</span>
+                                <span class="badge @StatusBadge(task.StatusId)">
+                                    @task.Status?.Name
+                                </span>
+                                <span class="badge @PriorityBadgeClass(task.Priority.ToString())">
+                                    @task.Priority
+                                </span>
+                                @if (task.DueDate is DateTime d)
+                                {
+                                    <span class="badge bg-light text-dark">
+                                        due @d.ToShortDateString()
+                                    </span>
+                                }
+                            </p>
+
+                            <div class="mt-auto d-flex gap-2">
+                                @if (task.StatusId == "open")
+                                {
+                                    <form asp-action="MarkComplete" method="post" asp-route-id="@ViewBag.Filters.FilterString">
+                                        <input type="hidden" name="Id" value="@task.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-success">Mark Complete</button>
+                                    </form>
+                                }
+                                <a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Add & Delete Buttons -->
+        <form asp-action="Delete" method="post" asp-route-id="@ViewBag.Filters.FilterString" class="mt-4">
+            <a asp-action="Add" class="btn btn-primary">Add New Task</a>
+            <button type="submit" class="btn btn-danger ms-2">Delete Completed Tasks</button>
         </form>
     </div>
 </div>

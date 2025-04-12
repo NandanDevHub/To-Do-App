@@ -115,5 +115,32 @@ namespace To_Do_App.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public IActionResult Edit(int id)
+        {
+            var todo = _context.ToDos.Find(id);
+            if (todo == null) return NotFound();
+
+            ViewBag.Categories = _context.Categories.ToList();
+            ViewBag.Statuses = _context.Statuses.ToList();
+            return View(todo);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(int id, ToDo todo)
+        {
+            if (id != todo.Id) return BadRequest();
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Categories = _context.Categories.ToList();
+                return View(todo);
+            }
+
+            _context.Update(todo);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }
