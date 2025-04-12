@@ -27,36 +27,41 @@
             <button type="submit" class="btn btn-primary">Filter</button>
             <a asp-action="Index" asp-route-id="" class="btn btn-primary">Clear</a>
         </form>
-    </ div>
+    </div>
     <div class="col-md-10">
         <form asp-action="MarkComplete" method="post" asp-route-id="@ViewBag.Filters.FilterString">
             <table class="table table-bordered table-striped mt-2">
                 <thead>
                 <tr>
-                <th scope="col">Description</th>
-                <th scope="col">Category</th>
-                <th scope="col">Due Date</th>
-                <th scope="col">Status</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Due Date</th>
+                <th>Status</th>
                 <th class="w-25">Actions</th>
-                </thead>
+                </thead>    
                 <tbody>
-                    @foreach (var task in Model)
-                    {
-                            var overdue = task.Overdue ? "bg-warning" : "";
-                            <tr>
-                                <td>@task.Description</td>
-                                <td>@task.Category.Name</td>
-                                <td class="@overdue">@task.DueDate?.ToShortDateString()</td>
-                                <td>
-                                    @if (task.StatusId == "open")
-                                    {
-                                        <button type="submit" class="btn btn-primary btn-sm" name="@nameof(ToDo.Id)">Mark Completed</button>
-                                    }
-                                </td>
-                            </tr>
-                    }
+                @foreach (var task in Model)
+                {
+                    var overdue = task.Overdue ? "bg-warning" : "";
+                    <tr>
+                        <td>@task.Description</td>
+                        <td>@task.Category.Name</td>
+                        <td class="@overdue">@task.DueDate?.ToShortDateString()</td>
+                        <td class="@overdue">@task.Status.Name</td>
+                        <td>
+                            @if (task.StatusId == "open")
+                            {
+                                <button type="submit" class="btn btn-primary btn-sm" name="@nameof(ToDo.Id)">Mark Completed</button>
+                            }
+                        </td>
+                    </tr>
+                }
                 </tbody>
             </table>
+        </form>
+        <form asp-action="Delete" method="post" asp-route-id="@ViewBag.Filters.FilterString">
+            <a asp-action="Add" class="btn btn-primary"> Add New task</a>
+                <button type="submit" class="btn btn-primary ">Delete completed tasks</button>
         </form>
     </div>
 </div>
