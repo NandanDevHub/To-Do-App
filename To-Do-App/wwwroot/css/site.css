@@ -16,3 +16,74 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.btn {
+    border-radius: 5px;
+}
+
+.task-header {
+    background-color: #8bd113;
+}
+
+.task-footer {
+    background-color: #8bd113;
+}
+
+.btn-primary {
+    background-color: #8bd113;
+    border-color: #8bd113;
+    color: #212529;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+        background-color: #7cc004;
+        border-color: #7cc004;
+ }
+
+.btn-outline-primary {
+    color: #8bd113;
+    border-color: #8bd113;
+}
+
+.btn-outline-primary:hover {
+background-color: #8bd113;
+color: #212529;
+}
+
+.form-select {
+    border-color: #8bd113;
+    background-color: #ffffff;
+    color: #212529;
+    border-radius: 6px;
+}
+
+
+.form-select:hover,
+.form-select:focus {
+    border-color: #7cc004;
+    background-color: #fafff0;
+    transition: 0.2s ease-in-out;
+}
+
+select option:checked {
+    background-color: #8bd113;
+    color: #000;
+}
+
+.form-select {
+    border-color: #8bd113;
+    background-color: #fff;
+    color: #212529;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+    .form-select:focus {
+        border-color: #7cc004;
+        box-shadow: 0 0 0 0.2rem rgba(139, 209, 19, 0.25);
+        outline: none;
+    }
+
+    .form-select:hover {
+        background-color: #fcffe4;
+    }
+
